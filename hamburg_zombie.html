@@ -1,0 +1,144 @@
+<html>
+  <head>
+  <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-K55XCBC');</script>
+<!-- End Google Tag Manager -->
+    <title>Netizen Geo - Hamburg zombie run</title>
+  </head>
+  <style>
+#zombie_map {
+    height: 100%;
+    width: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    background-color: grey;}
+</style>
+  <body>
+ <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K55XCBC"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<div id="zombie_map"></div>
+
+<script>
+    var zombie_map;
+    var score = 0;
+    var tolerance = 200;
+    var old_position;	
+    all_markers = [];
+    var data = `53.59162069136396 9.946380338623046 weapons.png
+53.59791898043245 9.95349355693054 weapons.png
+53.596946514920695 9.94228192324829 weapons.png
+53.568743347681 9.967537603332518 weapons.png
+53.56866051934819 9.974801025344847 weapons.png
+53.56782288211739 9.959415874435424 weapons.png
+53.563890862548405 9.965629577636719 weapons.png
+53.564314990082636 9.962334117843627 weapons.png
+53.576570530004965 9.95177694316101 weapons.png
+53.57862424071708 9.950425109817504 weapons.png
+53.58220737845992 9.947635612442015 weapons.png
+53.5869781958461 9.947978935195922 weapons.png
+53.5933463724185 9.94325824732971 hospital.png
+53.58753863389507 9.972183189346312 hospital.png
+53.563719460968706 9.960687948012138 hospital.png
+53.59780376241355 9.98972438594412 hospital.png
+53.615976363159795 9.966438985792898 zombie.png
+53.607625594478264 9.94240639301946 zombie.png
+53.56396017441667 9.977021327094743 zombie.png
+53.57582255718458 9.952731242255876 zombie.png
+53.58933979608355 9.948318374560298 zombie.png
+53.59530655851318 9.942026138305664 food.png
+53.588320855713654 9.946043861315669 food.png
+53.5810411719104 9.947433471679688 food.png
+53.563740349661515 9.967690940353119 food.png
+53.56309293364021 9.965459342452728 food.png
+53.56444383017698 9.965566630813324 food.png
+53.566923890069596 9.9570894241333 food.png
+53.5624267095943 9.962347979995453 beverage.png
+53.56188802975657 9.961961741897309 beverage.png
+53.56264190564469 9.961788654327393 beverage.png
+53.56480650510269 9.959451194259369 beverage.png
+53.59450126632304 9.942585463973725 beverage.png
+53.59661523096697 9.951597686263764 beverage.png
+53.59475256974549 10.00760221049472 beverage.png
+53.60208727549502 9.979106421920502 beverage.png`;
+    var markers = data.split("\n");
+    function initMap() {
+            zombie_map = new google.maps.Map(document.getElementById('zombie_map'), {
+            zoom: 15,
+            center: {lat: 53.5982961, lng: 9.9394004}  
+        });
+	old_position = new google.maps.Marker({
+        position: new google.maps.LatLng(53.5982961, 9.9394004),
+        map: zombie_map,
+        icon: 'player.png'
+	}); 
+	for(var i=0; i < markers.length; i++){
+        var marker_data = markers[i].trim();
+	marker_data = marker_data.split(" ");
+	var latitude = marker_data[0];
+        var longitude = marker_data[1];
+        var emoji = marker_data[2];
+	var marker_position = new google.maps.LatLng(latitude, longitude);
+	var marker = new google.maps.Marker({
+        position: marker_position,
+        map: zombie_map,
+        icon: emoji
+	});
+        all_markers.push(marker);
+	}
+	if(navigator.geolocation) {
+    navigator.geolocation.watchPosition(set_my_position);
+    }
+    else {
+    alert("Geolocation doesn't work in your browser");
+    }
+    }
+	function set_my_position(position){
+	old_position.setMap(null);
+	var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+	var player = 'player.png'
+	var marker = new google.maps.Marker({
+    position: pos,
+    map: zombie_map,
+	icon: player
+    });
+    old_position = marker;
+    for(var i=0; i < all_markers.length; i++){
+    var distance = google.maps.geometry.spherical.computeDistanceBetween(pos, all_markers[i].getPosition());
+    if( distance < tolerance ){
+    var what_is_it = all_markers[i].getIcon();
+    what_is_it = what_is_it.replace(".png", "");
+    alert("Found the " + what_is_it);
+    all_markers[i].setMap(null);
+    all_markers[i]=null;	    
+    if( what_is_it != "zombie" ){
+        score +=10;
+	alert("Your score is " + score)
+    } else {
+    score += -10;
+    alert("Njammy...mmmm, brains " + score);
+    if (score < 0){
+    alert("You walk like a zombie, now ")
+    } else {
+    alert("Ruuuuuun! Try to stay away from here! There is still chance for human race ")
+    }	    
+    }	    
+    }		
+    }
+    }
+
+
+	
+</script>
+	<script async defer
+	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDeYMsTLmzuZ65KM_TqK0HPPUb-RQdYbCs&callback=initMap&libraries=geometry">
+<!--    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmTDs4l0IL6ZLkthwH5voH1dnTdo4qwLI&callback=initMap&libraries=geometry"   Restricted key -->
+    </script>
+  </body>
+</html>
